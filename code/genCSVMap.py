@@ -38,6 +38,13 @@ def prepare_labels_dataset(
     labels_df['Patient_Gender'] = labels_df['Patient_Gender'].fillna('U')
     labels_df['View_Position'] = labels_df['View_Position'].fillna('UNK')
 
+    def clean_labels(x):
+        parts = [p.strip() for p in x.split('|') if p.strip() != 'No Finding']
+        return '|'.join(parts)
+
+    labels_df['Finding_Labels'] = labels_df['Finding_Labels'].apply(clean_labels)
+    labels_df = labels_df[labels_df['Finding_Labels'] != ''].reset_index(drop=True)
+
     for disease in tqdm(disease_labels, desc="One-hot encoding diseases"):
         labels_df[disease] = labels_df['Finding_Labels'].map(lambda result: 1 if disease in result else 0)
 
@@ -59,7 +66,7 @@ def prepare_labels_dataset(
 
     output_path = os.path.join(base_path, output_filename)
     processed_df.to_csv(output_path, index=False)
-    print(f"✅ Dataset procesado guardado en: {output_path}")
+    print(f"Dataset procesado guardado en: {output_path}")
 
     train_val_df = processed_df.merge(labels_train_val, on='Image_Index', how='inner')
     test_df = processed_df.merge(labels_test, on='Image_Index', how='inner')
