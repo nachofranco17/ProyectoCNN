@@ -2,6 +2,7 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
+import pandas as pd
 
 class datasetMgr(Dataset):
     
@@ -28,7 +29,7 @@ class datasetMgr(Dataset):
         
         gender = self.df.loc[idx, 'Gender_Code']
         view = self.df.loc[idx, 'View_Code']
-        age = self.df.loc[idx, 'Patient_Age'] / 100.0 
+        age = self.df.loc[idx, 'Patient_Age'] if 'Patient_Age' in self.df.columns else self.df['Patient_Age'].mean()
 
         meta = torch.tensor([gender, view, age], dtype=torch.float32)
 

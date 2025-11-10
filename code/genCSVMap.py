@@ -37,6 +37,7 @@ def prepare_labels_dataset(
     labels_df['Finding_Labels'] = labels_df['Finding_Labels'].fillna('No Finding')
     labels_df['Patient_Gender'] = labels_df['Patient_Gender'].fillna('U')
     labels_df['View_Position'] = labels_df['View_Position'].fillna('UNK')
+    labels_df['Patient_Age'] = labels_df['Patient_Age'].fillna(labels_df['Patient_Age'].mean())
 
     def clean_labels(x):
         parts = [p.strip() for p in x.split('|') if p.strip() != 'No Finding']
@@ -61,7 +62,7 @@ def prepare_labels_dataset(
 
     labels_df['Path'] = labels_df['Image_Index'].map(img_path.get)
 
-    columns_to_keep = ['Image_Index', 'Path', 'Gender_Code', 'View_Code'] + disease_labels
+    columns_to_keep = ['Image_Index', 'Path', 'Patient_Age', 'Gender_Code', 'View_Code'] + disease_labels
     processed_df = labels_df[columns_to_keep].dropna(subset=['Path'])
 
     output_path = os.path.join(base_path, output_filename)

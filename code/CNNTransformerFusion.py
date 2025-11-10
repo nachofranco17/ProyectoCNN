@@ -8,10 +8,15 @@ from tqdm import tqdm
 class CNNTransformerFusion(nn.Module):
     def __init__(self, num_classes=14, num_meta=3, d_model=256, nhead=4, num_layers=2):
         super().__init__()
-
-        base = models.resnet121(weights='IMAGENET1K_V1')
-        self.cnn = nn.Sequential(*list(base.children())[:-1])  # sin FC
-        cnn_feat_dim = base.fc.in_features  # 1024 en ResNet-121
+        base = models.densenet121(weights='IMAGENET1K_V1')
+        # DenseNet's `features` outputs a feature map (batch, 1024, 7, 7) for 224x224 input.
+        # Apply global average pooling so we get a (batch, 1024, 1, 1) tensor, then flatten to (batch, 1024).
+        self.cnn = nn.Sequential(
+            base.features,
+            nn.ReLU(inplace=True),
+            nn.AdaptiveAvgPool2d((1, 1))
+        )
+        cnn_feat_dim = base.classifier.in_features  # 1024 en DenseNet-121
         self.img_proj = nn.Linear(cnn_feat_dim, d_model)
         self.meta_proj = nn.Linear(num_meta, d_model)
 
