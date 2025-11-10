@@ -26,9 +26,18 @@ class datasetMgr(Dataset):
         
         labels = self.df.loc[idx, self.disease_columns].values.astype(np.float32)
         
+        gender = self.df.loc[idx, 'Gender_Code']
+        view = self.df.loc[idx, 'View_Code']
+        age = self.df.loc[idx, 'Patient_Age'] / 100.0 
+
+        meta = torch.tensor([gender, view, age], dtype=torch.float32)
+
+
         if self.transform:
             image = self.transform(image)
+
+        
         
         labels = torch.tensor(labels, dtype=torch.float32)
         
-        return image, labels
+        return image, meta, labels
