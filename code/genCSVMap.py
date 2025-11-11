@@ -25,7 +25,7 @@ def prepare_labels_dataset(
 
     labels_train_val = pd.read_csv(train_val_path, names=['Image_Index'])
     labels_test = pd.read_csv(test_path, names=['Image_Index'])
-
+    print(f"labels train size 1: {labels_train_val.shape}")
     cols = [
         'Image_Index', 'Finding_Labels', 'Follow_Up_#', 'Patient_ID',
         'Patient_Age', 'Patient_Gender', 'View_Position',
